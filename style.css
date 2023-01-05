@@ -73,6 +73,18 @@ h1 {
   text-align: center;
 }
 
+.bt {
+  border-top: 1px solid #777777;
+}
+
+.bb {
+  border-bottom: 1px solid #777777;
+}
+
+.target {
+  border: 4px solid white;
+}
+
 /* header */
 header {
   align-items: center;

@@ -1,13 +1,15 @@
+// script variables
 let pokemonAmount = 200;
 let pokedexContainer = document.getElementsByClassName("pokedex-container")[0];
 let main = document.getElementsByTagName("main")[0];
 let datasets = [];
-let names= [];
+let names = [];
 let about;
 let stats;
 let moves;
-let header= document.getElementsByTagName('header')[0];
+let header = document.getElementsByTagName("header")[0];
 
+// get data about the first 200 pokemons from PokeAPI (contains name, stats images etc.)
 async function getPokemonData() {
   for (let i = 0; i < pokemonAmount; i++) {
     let url = `https:pokeapi.co/api/v2/pokemon/${i + 1}`;
@@ -15,7 +17,9 @@ async function getPokemonData() {
     let currentPokemonData = await response.json();
     datasets.push(currentPokemonData);
     names.push(currentPokemonData.name);
+    // push data to script arrays to make them accessible everywhere
     renderPokemon(currentPokemonData, i);
+    // render respective pokemon to screen with img and basic features
   }
 }
 
@@ -36,7 +40,9 @@ function renderPokemon(pokemon, i) {
   let descriptionContainer = document.createElement("div");
   pokemonCard.append(descriptionContainer);
   descriptionContainer.classList.add("flex-column");
-  descriptionContainer.innerHTML += `<h1 class="title">${pokemon.name}</h1>`;
+  descriptionContainer.innerHTML += `<h1 class="title">${capitalizeFirstLetter(
+    pokemon.name
+  )}</h1>`;
   let id = document.createElement("p");
   pokemonCard.append(id);
   id.innerText = `#${pokemon.id}`;
@@ -52,13 +58,15 @@ function openCard(i) {
   let overlay = document.createElement("div");
   overlay.classList.add("overlay");
   overlay.innerHTML = /*html*/ `
-  <div class="card-zoom-info" style="background-color: var(--c-${pokemon.types[0].type.name})">
+  <div class="card-zoom-info" style="background-color: var(--c-${
+    pokemon.types[0].type.name
+  })">
     	<div class="card-zoom-info__header">
         <p id="close-zoom-in">	&#8592</p>
         <p># ${pokemon.id}</p>
       </div>
       <div class="card-zoom-info__types">
-      <h1>${pokemon.name}</h1>
+      <h1>${capitalizeFirstLetter(pokemon.name)}</h1>
       <p> ${pokemon.types[0].type.name}</p>
       </div>
       <img src="images/pokeball.png" alt="pokeball">
@@ -89,7 +97,7 @@ function openCard(i) {
   about = getElement("about");
   stats = getElement("stats");
   renderAbout(i);
-  header.classList.add('d-none');
+  header.classList.add("d-none");
 }
 
 //helper functions
@@ -100,7 +108,7 @@ let getElement = (id) => {
 function renderAbout(i) {
   let aboutContainer = getElement("dynamic-info-container");
   let pokemon = datasets[i];
-  aboutContainer.innerHTML = /*html*/ `<div class="attribute-row flex-row ml-1 mr-1 mt-3">
+  aboutContainer.innerHTML = /*html*/ `<div class="attribute-row flex-row ml-1 mr-1 mt-3 bt">
                 <p>Height</p>
                 <p>${pokemon.height * 10} cm</p>
             </div>
@@ -108,7 +116,7 @@ function renderAbout(i) {
               <p>Weight</p>
               <p>${pokemon.weight} kg</p>
             </div>
-            <div class="attribute-row flex-row ml-1 mr-1 mt-1">
+            <div class="attribute-row flex-row ml-1 mr-1 mt-1 bb">
              <p>Abilities</p>
               <p>${pokemon.abilities[0].ability.name}</p>
             </div>
@@ -119,11 +127,15 @@ function renderAbout(i) {
                 <p class="mt-1">Exotic</p>
               </div>
               <div class="flex-column-center">
-                <img src="${pokemon.sprites.other.dream_world.front_default}" alt="1">
+                <img src="${
+                  pokemon.sprites.other.dream_world.front_default
+                }" alt="1">
                 <p class="mt-1">Dream World</p>
               </div>
               <div class="flex-column-center">
-                <img src="${pokemon.sprites.other['official-artwork'].front_default}" alt="3">
+                <img src="${
+                  pokemon.sprites.other["official-artwork"].front_default
+                }" alt="3">
                 <p class="mt-1">Antic</p>
               </div>
             </div>
@@ -218,29 +230,28 @@ function renderMoves(i) {
 function closePokemonZoom() {
   document.getElementsByClassName("overlay")[0].remove();
   pokedexContainer.classList.remove("d-none");
-  header.classList.remove('d-none');
+  header.classList.remove("d-none");
 }
 
+/* search logic */
 
+let search = document.getElementsByTagName("input")[0];
+let resultsHTML = getElement("search-results");
 
-/* search logic */ 
-
-let search= document.getElementsByTagName('input')[0]; 
-let resultsHTML= getElement('search-results');
-
-search.oninput= function () {
+search.oninput = function () {
   const userInput = this.value.toLowerCase();
-  resultsHTML.classList.remove('d-none');
+  resultsHTML.classList.remove("d-none");
   resultsHTML.innerHTML = "";
   if (userInput.length > 0) {
     let results = getResults(userInput);
     for (i = 0; i < results.length; i++) {
-      let result= results[i];
-      let index= names.findIndex(element => element == result);
+      let result = results[i];
+      let index = names.findIndex((element) => element == result);
       result = capitalizeFirstLetter(result);
       resultsHTML.innerHTML += /*html*/ `<li class="suggestion" onclick="goToPokemon(${index})">${result}</li>`;
     }
-
+  } else {
+    resultsHTML.classList.add("d-none");
   }
 };
 
@@ -260,15 +271,19 @@ function capitalizeFirstLetter(word) {
 }
 
 function goToPokemon(index) {
-  let pokemonCards= document.getElementsByClassName('pokemon-card');
-  let pokemon= pokemonCards[index];
-  resultsHTML.classList.add('d-none');
-  resultsHTML.innerHTML= "";
-  search.value= "";
-  pokemon.scrollIntoView(
-    {
-      block: "center"
-    }
-  );
+  let pokemonCards = document.getElementsByClassName("pokemon-card");
+  let pokemon = pokemonCards[index];
+  resultsHTML.classList.add("d-none");
+  resultsHTML.innerHTML = "";
+  search.value = "";
+  pokemon.scrollIntoView({
+    block: "center",
+  });
 }
+
+document.addEventListener("click", function () {
+  if (document.activeElement != search) {
+    resultsHTML.classList.add("d-none");
+  }
+});
 

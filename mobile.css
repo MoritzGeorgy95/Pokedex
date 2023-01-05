@@ -20,7 +20,7 @@
 
 @media screen and (max-width: 650px) {
     .card-zoom-description img:first-of-type {
-        width: 150px;
+        width: 120px;
         top: -7.5rem;
     }
 }
