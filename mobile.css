@@ -16,6 +16,9 @@
     header img {
         width: 35%;
     }
+    .pokemon-card:hover {
+        transform: scale(1);
+    }
 }
 
 @media screen and (max-width: 650px) {
