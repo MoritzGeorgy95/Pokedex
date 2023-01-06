@@ -1,5 +1,5 @@
 // script variables
-let pokemonAmount = 200;
+let pokemonAmount = 500;
 let pokedexContainer = document.getElementsByClassName("pokedex-container")[0];
 let main = document.getElementsByTagName("main")[0];
 let datasets = [];
@@ -53,6 +53,7 @@ function renderPokemon(pokemon, i) {
 }
 
 function openCard(i) {
+  removeTargetBorder();
   let pokemon = datasets[i];
   pokedexContainer.classList.add("d-none");
   let overlay = document.createElement("div");
@@ -233,7 +234,7 @@ function closePokemonZoom() {
   header.classList.remove("d-none");
 }
 
-/* search logic */
+/* search logic*/
 
 let search = document.getElementsByTagName("input")[0];
 let resultsHTML = getElement("search-results");
@@ -244,11 +245,15 @@ search.oninput = function () {
   resultsHTML.innerHTML = "";
   if (userInput.length > 0) {
     let results = getResults(userInput);
-    for (i = 0; i < results.length; i++) {
-      let result = results[i];
-      let index = names.findIndex((element) => element == result);
-      result = capitalizeFirstLetter(result);
-      resultsHTML.innerHTML += /*html*/ `<li class="suggestion" onclick="goToPokemon(${index})">${result}</li>`;
+    if (results.length > 0) {
+      for (i = 0; i < results.length; i++) {
+        let result = results[i];
+        let index = names.findIndex((element) => element == result);
+        result = capitalizeFirstLetter(result);
+        resultsHTML.innerHTML += /*html*/ `<li class="suggestion" onclick="goToPokemon(${index})">${result}</li>`;
+      }
+    } else {
+      resultsHTML.innerHTML += /*html*/ `<li class="suggestion">No matching Pokemon</li>`;
     }
   } else {
     resultsHTML.classList.add("d-none");
@@ -273,6 +278,7 @@ function capitalizeFirstLetter(word) {
 function goToPokemon(index) {
   let pokemonCards = document.getElementsByClassName("pokemon-card");
   let pokemon = pokemonCards[index];
+  pokemon.classList.add("target");
   resultsHTML.classList.add("d-none");
   resultsHTML.innerHTML = "";
   search.value = "";
@@ -287,3 +293,13 @@ document.addEventListener("click", function () {
   }
 });
 
+function removeTargetBorder() {
+  const pokemonCards = document.getElementsByClassName("pokemon-card");
+  for (let i = 0; i < pokemonCards.length; i++) {
+    if (pokemonCards[i].classList.contains('target')) {
+      pokemonCards[i].classList.remove('target');
+      break
+    }
+  }
+  
+}
