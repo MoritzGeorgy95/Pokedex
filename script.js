@@ -34,7 +34,7 @@ function closePokemonZoom() {
 // get data about the first 500 pokemons from PokeAPI (contains name, stats images etc.)
 async function getPokemonData() {
   for (let i = 0; i < pokemonAmount; i++) {
-    let url = `https:pokeapi.co/api/v2/pokemon/${i + 1}`;
+    let url = `https://pokeapi.co/api/v2/pokemon/${i + 1}`;
     let response = await fetch(url);
     let currentPokemonData = await response.json();
     datasets.push(currentPokemonData);
