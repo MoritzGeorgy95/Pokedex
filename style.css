@@ -44,6 +44,10 @@ h1 {
   margin-top: 1rem;
 }
 
+.mt-2 {
+  margin-top: 2rem;
+}
+
 .mt-3 {
   margin-top: 3rem;
 }
@@ -88,7 +92,7 @@ header {
   box-shadow: 0 2px 2px 1px rgb(0 0 0 / 14%);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 2;
   background-color: white;
 }
 
@@ -121,7 +125,7 @@ header ul {
   min-height: 200px;
   overflow-y: auto;
   background-color: white;
-  z-index: 10000000;
+  z-index: 3;
   list-style: none;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
@@ -156,7 +160,9 @@ main {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  background-color: rgb(206, 206, 206);
+  background-color: rgba(206, 206, 206, 0.4);
+  gap: 2rem;
+  padding: 2rem;
 }
 
 /* pokemon card small */
@@ -168,13 +174,13 @@ main {
   flex-direction: row-reverse;
   justify-content: space-between;
   align-items: center;
-  margin: 12px;
   width: 20rem;
   height: 12rem;
   padding: 20px 20px;
   border-radius: 20px;
   color: white;
   overflow: hidden;
+  transition: all 225ms ease-in-out;
 }
 
 .target {
@@ -203,7 +209,7 @@ main {
 .pokemon-card img:first-of-type {
   width: 130px;
   height: 130px;
-  z-index: 10;
+  z-index: 1;
 }
 .pokemon-card img:nth-of-type(2) {
   position: absolute;
@@ -224,20 +230,26 @@ main {
 /* pokemon card after zoom in (after user has clicked on it */
 
 .overlay {
-  width: 100%;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 10;
+  z-index: 4;
+  background: rgba(0, 0, 0, .6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .card-zoom-info {
-  padding: 1.5rem;
+  padding: 1.5rem 1.2rem;
   height: 30vh;
   overflow: hidden;
   position: relative;
+  width: 50%;
+  border-radius: 20px 20px 0 0;
 }
 
 .card-zoom-info__header {
@@ -279,9 +291,10 @@ main {
 .card-zoom-description {
   position: relative;
   border: 20px solid white;
-  border-radius: 38px 38px 0 0;
+  border-radius: 38px 38px 20px 20px;
   margin-top: -2rem;
   background: white;
+  width: 50%;
 }
 
 .card-zoom-description img:first-of-type {
@@ -295,7 +308,7 @@ main {
 
 .card-zoom-description__navbar {
   display: flex;
-  margin-top: 7rem;
+  margin-top: 3rem;
   justify-content: space-around;
 }
 
@@ -324,6 +337,8 @@ main {
 #moves-list {
   display: flex;
   flex-wrap: wrap;
+  overflow-y: scroll;
+  max-height: 300px;
 }
 
 #moves-list li {
@@ -334,7 +349,6 @@ main {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-top: 4rem;
 }
 
 .evolution-container img {
@@ -348,4 +362,9 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* temporary class to stop scrolling */
+.noScroll {
+  overflow-y: hidden;
 }

@@ -1,6 +1,7 @@
-// =============== Pokedex Version 1 Moritz Georgy ================= // 
+// =============== Pokedex Version 1 Moritz Georgy ================= //
 // script variables
-let pokemonAmount = 500;
+let pokemonStart = 0;
+let pokemonEnd= 30;
 let pokedexContainer = document.getElementsByClassName("pokedex-container")[0];
 let main = document.getElementsByTagName("main")[0];
 let datasets = [];
@@ -9,7 +10,8 @@ let about;
 let stats;
 let moves;
 let header = document.getElementsByTagName("header")[0];
-
+let isLoadingData = false;
+let scrollingThreshhold= window.innerHeight * .7;
 //================ helper functions ========================= //
 
 //get Element reference by ID
@@ -25,29 +27,40 @@ function capitalizeFirstLetter(word) {
 //close the detailed view of a Pokemon
 function closePokemonZoom() {
   document.getElementsByClassName("overlay")[0].remove();
-  pokedexContainer.classList.remove("d-none");
-  header.classList.remove("d-none");
+  document.body.classList.remove("noScroll");
 }
 
 //======= main functionality ====== /
 
-// get data about the first 500 pokemons from PokeAPI (contains name, stats images etc.)
+// get data about the first 20 pokemons from PokeAPI on page load (contains name, stats images etc.)
 async function getPokemonData() {
-  for (let i = 0; i < pokemonAmount; i++) {
-    let url = `https://pokeapi.co/api/v2/pokemon/${i + 1}`;
-    let response = await fetch(url);
-    let currentPokemonData = await response.json();
-    datasets.push(currentPokemonData);
-    names.push(currentPokemonData.name);
-    // push data to script arrays to make them accessible everywhere
-    renderPokemon(currentPokemonData, i);
-    // render respective pokemon to screen with img and basic features
-  }
+  isLoadingData= true; 
+
+    for (let i = pokemonStart; i < pokemonEnd; i++) {
+      let url = `https://pokeapi.co/api/v2/pokemon/${i + 1}`;
+      let response = await fetch(url);
+      let currentPokemonData = await response.json();
+      datasets.push(currentPokemonData);
+      names.push(currentPokemonData.name);
+      // push data to script arrays to make them accessible everywhere
+      renderPokemon(currentPokemonData, i);
+      // render respective pokemon to screen with img and basic features
+    }
+  isLoadingData= false;
 }
+
+window.addEventListener('scroll', function(){
+  if (!isLoadingData && window.scrollY>= scrollingThreshhold) {
+    pokemonStart= pokemonEnd;
+    pokemonEnd += 30;
+    getPokemonData();
+    scrollingThreshhold += scrollingThreshhold;
+  }
+})
+
 
 //render respective pokemon
 function renderPokemon(pokemon, i) {
-  
   createPokemonCard(pokemon, i);
   appendImages(pokemon, i);
   appendDescription(pokemon, i);
@@ -68,7 +81,7 @@ function createPokemonCard(pokemon, i) {
 
 //adding the pokemon image
 function appendImages(pokemon, i) {
-  let pokemonCard= document.getElementsByClassName('pokemon-card')[i];
+  let pokemonCard = document.getElementsByClassName("pokemon-card")[i];
   let image1 = document.createElement("img");
   let image2 = document.createElement("img");
   pokemonCard.append(image1);
@@ -77,9 +90,9 @@ function appendImages(pokemon, i) {
   image1.src = pokemon.sprites.other.dream_world.front_default;
 }
 
-// adding the description to it 
+// adding the description to it
 function appendDescription(pokemon, i) {
-  let pokemonCard= document.getElementsByClassName('pokemon-card')[i];
+  let pokemonCard = document.getElementsByClassName("pokemon-card")[i];
   let descriptionContainer = document.createElement("div");
   pokemonCard.append(descriptionContainer);
   descriptionContainer.classList.add("flex-column");
@@ -99,9 +112,9 @@ function appendDescription(pokemon, i) {
 function openCard(i) {
   // if one pokemon is already highlighted, remove its border
   removeTargetBorder();
+  document.body.classList.add("noScroll");
   // display detailed view of pokemon
   let pokemon = datasets[i];
-  pokedexContainer.classList.add("d-none");
   let overlay = document.createElement("div");
   overlay.classList.add("overlay");
   overlay.innerHTML = pokemonDetailHTML(pokemon);
@@ -113,9 +126,7 @@ function openCard(i) {
   about = getElement("about");
   stats = getElement("stats");
   renderAbout(i);
-  header.classList.add("d-none");
 }
-
 
 // detailed pokemon HTML template
 function pokemonDetailHTML(pokemon) {
@@ -133,7 +144,7 @@ function pokemonDetailHTML(pokemon) {
       </div>
       <img src="images/pokeball.png" alt="pokeball">
   </div>
-    <div class="card-zoom-description">
+  <div class="card-zoom-description">
     <img src="${pokemon.sprites.other.dream_world.front_default}">
     <div class="card-zoom-description__navbar">
       <a id="about">About</a>
@@ -144,8 +155,8 @@ function pokemonDetailHTML(pokemon) {
   </div>`;
 }
 
-// adding event listeners to navbr and closing button 
-function addEventListenersToNavbar (i) {
+// adding event listeners to navbr and closing button
+function addEventListenersToNavbar(i) {
   getElement("about").addEventListener("click", function () {
     renderAbout(i);
   });
@@ -172,7 +183,7 @@ function renderAbout(i) {
 
 //about Pokemon HTML template
 function aboutHTML(pokemon) {
-  return /*html*/ `<div class="attribute-row flex-row ml-1 mr-1 mt-3 bt">
+  return /*html*/ `<div class="attribute-row flex-row ml-1 mr-1 mt-2 bt">
   <p>Height</p>
   <p>${pokemon.height * 10} cm</p>
 </div>
@@ -185,21 +196,17 @@ function aboutHTML(pokemon) {
 <p>${pokemon.abilities[0].ability.name}</p>
 </div>
 <h2 class="text-center mt-1">Gallery</h2>
-<div class="evolution-container mt-3">
+<div class="evolution-container mt-2">
 <div class="flex-column-center">
   <img src="${pokemon.sprites.other.home.front_shiny}" alt="2">
   <p class="mt-1">Exotic</p>
 </div>
 <div class="flex-column-center">
-  <img src="${
-    pokemon.sprites.other.dream_world.front_default
-  }" alt="1">
+  <img src="${pokemon.sprites.other.dream_world.front_default}" alt="1">
   <p class="mt-1">Dream World</p>
 </div>
 <div class="flex-column-center">
-  <img src="${
-    pokemon.sprites.other["official-artwork"].front_default
-  }" alt="3">
+  <img src="${pokemon.sprites.other["official-artwork"].front_default}" alt="3">
   <p class="mt-1">Antic</p>
 </div>
 </div>
@@ -219,7 +226,6 @@ function renderStats(i) {
   stats.classList.add("bold");
   moves.classList.remove("bold");
   about.classList.remove("bold");
-  window.scrollTo(0, document.body.scrollHeight);
 }
 
 //create the pokemon stats chart
@@ -280,8 +286,6 @@ function renderStatsChart(ctx, pokemon) {
   });
 }
 
-
-
 //render all the moves the pokemon has
 function renderMoves(i) {
   let pokemon = datasets[i];
@@ -298,15 +302,13 @@ function renderMoves(i) {
   about.classList.remove("bold");
 }
 
-
-
 // ====== Logic for the search input field that makes suggestions to the user ===== //
 
 //define HTML Elements
 let search = document.getElementsByTagName("input")[0];
 let resultsHTML = getElement("search-results");
 
-//check user input and render suggestions 
+//check user input and render suggestions
 search.oninput = function () {
   const userInput = this.value.toLowerCase();
   resultsHTML.classList.remove("d-none");
@@ -321,12 +323,12 @@ search.oninput = function () {
         result = capitalizeFirstLetter(result);
         resultsHTML.innerHTML += /*html*/ `<li class="suggestion" onclick="goToPokemon(${index})">${result}</li>`;
       }
-    } 
-    //if the user types in letters or words that do not match any Pokemon we get the message that no results were found 
+    }
+    //if the user types in letters or words that do not match any Pokemon we get the message that no results were found
     else {
       resultsHTML.innerHTML += /*html*/ `<li class="suggestion">No matching Pokemon</li>`;
     }
-  } 
+  }
   //if the user deletes the last letter the suggestion box closes
   else {
     resultsHTML.classList.add("d-none");
@@ -344,8 +346,7 @@ function getResults(input) {
   return results;
 }
 
-
-// scroll down to the pokemon that has been searched and clicked on 
+// scroll down to the pokemon that has been searched and clicked on
 function goToPokemon(index) {
   let pokemonCards = document.getElementsByClassName("pokemon-card");
   let pokemon = pokemonCards[index];
@@ -369,10 +370,9 @@ document.addEventListener("click", function () {
 function removeTargetBorder() {
   const pokemonCards = document.getElementsByClassName("pokemon-card");
   for (let i = 0; i < pokemonCards.length; i++) {
-    if (pokemonCards[i].classList.contains('target')) {
-      pokemonCards[i].classList.remove('target');
-      break
+    if (pokemonCards[i].classList.contains("target")) {
+      pokemonCards[i].classList.remove("target");
+      break;
     }
   }
-  
 }
