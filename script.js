@@ -1,7 +1,7 @@
 // =============== Pokedex Version 1 Moritz Georgy ================= //
 // script variables
 let pokemonStart = 0;
-let pokemonEnd= 30;
+let pokemonEnd = 30;
 let pokedexContainer = document.getElementsByClassName("pokedex-container")[0];
 let main = document.getElementsByTagName("main")[0];
 let datasets = [];
@@ -11,7 +11,7 @@ let stats;
 let moves;
 let header = document.getElementsByTagName("header")[0];
 let isLoadingData = false;
-let scrollingThreshhold= window.innerHeight * .7;
+let scrollingThreshhold = window.innerHeight * 0.7;
 //================ helper functions ========================= //
 
 //get Element reference by ID
@@ -34,30 +34,29 @@ function closePokemonZoom() {
 
 // get data about the first 20 pokemons from PokeAPI on page load (contains name, stats images etc.)
 async function getPokemonData() {
-  isLoadingData= true; 
+  isLoadingData = true;
 
-    for (let i = pokemonStart; i < pokemonEnd; i++) {
-      let url = `https://pokeapi.co/api/v2/pokemon/${i + 1}`;
-      let response = await fetch(url);
-      let currentPokemonData = await response.json();
-      datasets.push(currentPokemonData);
-      names.push(currentPokemonData.name);
-      // push data to script arrays to make them accessible everywhere
-      renderPokemon(currentPokemonData, i);
-      // render respective pokemon to screen with img and basic features
-    }
-  isLoadingData= false;
+  for (let i = pokemonStart; i < pokemonEnd; i++) {
+    let url = `https://pokeapi.co/api/v2/pokemon/${i + 1}`;
+    let response = await fetch(url);
+    let currentPokemonData = await response.json();
+    datasets.push(currentPokemonData);
+    names.push(currentPokemonData.name);
+    // push data to script arrays to make them accessible everywhere
+    renderPokemon(currentPokemonData, i);
+    // render respective pokemon to screen with img and basic features
+  }
+  isLoadingData = false;
 }
 
-window.addEventListener('scroll', function(){
-  if (!isLoadingData && window.scrollY>= scrollingThreshhold) {
-    pokemonStart= pokemonEnd;
+window.addEventListener("scroll", function () {
+  if (!isLoadingData && window.scrollY >= scrollingThreshhold) {
+    pokemonStart = pokemonEnd;
     pokemonEnd += 30;
     getPokemonData();
     scrollingThreshhold += scrollingThreshhold;
   }
-})
-
+});
 
 //render respective pokemon
 function renderPokemon(pokemon, i) {
@@ -118,6 +117,9 @@ function openCard(i) {
   let overlay = document.createElement("div");
   overlay.classList.add("overlay");
   overlay.innerHTML = pokemonDetailHTML(pokemon);
+  overlay.addEventListener("click", () => {
+    closePokemonZoom();
+  });
   main.append(overlay);
   // add click event listener to the navbar in the pokemon description
   addEventListenersToNavbar(i);
@@ -133,7 +135,7 @@ function pokemonDetailHTML(pokemon) {
   return /*html*/ `
   <div class="card-zoom-info" style="background-color: var(--c-${
     pokemon.types[0].type.name
-  })">
+  })" onclick="event.stopPropagation()">
     	<div class="card-zoom-info__header">
         <p id="close-zoom-in">	&#8592</p>
         <p># ${pokemon.id}</p>
@@ -144,7 +146,7 @@ function pokemonDetailHTML(pokemon) {
       </div>
       <img src="images/pokeball.png" alt="pokeball">
   </div>
-  <div class="card-zoom-description">
+  <div class="card-zoom-description" onclick="event.stopPropagation()">
     <img src="${pokemon.sprites.other.dream_world.front_default}">
     <div class="card-zoom-description__navbar">
       <a id="about">About</a>
